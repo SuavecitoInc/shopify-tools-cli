@@ -124,7 +124,7 @@ export const searchBySku = async (store: string, sku: string) => {
     console.log('FOUND SHOPIFY PRODUCTS', product.id);
     let id: string;
     if (product.hasOnlyDefaultVariant) {
-      id = product.id;
+      id = product.variants.edges[0].node.id;
     } else {
       console.log('MATCHING SKU TO PRODUCT VARIANT');
       const variants = product.variants.edges;
