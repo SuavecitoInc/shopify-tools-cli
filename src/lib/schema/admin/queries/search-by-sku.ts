@@ -6,7 +6,7 @@ const query = `#graphql
           id
           title
           hasOnlyDefaultVariant
-          variants(first:25) {
+          variants(first:150) {
             edges {
               node {
                 sku
