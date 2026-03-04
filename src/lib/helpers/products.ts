@@ -6,6 +6,7 @@ import {
   searchBySKUv2Query,
   metafieldsSetMutation,
   productVariantUpdateMutation,
+  productVariantsBulkUpdateMutation,
 } from '../schema/admin';
 import type {
   TagsAddMutation,
@@ -14,6 +15,7 @@ import type {
   SearchBySkUv2Query,
   MetafieldsSetMutation,
   ProductVariantUpdateMutation,
+  ProductVariantsBulkUpdateMutation,
 } from '../types/admin.generated';
 
 export const addShopifyProductTags = async (
@@ -142,6 +144,62 @@ export const searchBySku = async (store: string, sku: string) => {
 
     const item = {
       product: {
+        id: id,
+      },
+    };
+
+    return item;
+  } catch (err: any) {
+    console.log(err.message);
+    return false;
+  }
+};
+
+export const searchBySKU = async (store: string, sku: string) => {
+  const variables = {
+    filter: `sku:${sku}`,
+  };
+
+  try {
+    const searchResult = await fetchAdmin<SearchBySkuQuery>(
+      store,
+      searchBySKUQuery,
+      variables
+    );
+
+    if (searchResult?.errors && searchResult.errors.length > 0) {
+      throw new Error(searchResult.errors[0].message);
+    }
+
+    if (!searchResult?.data.products) {
+      throw new Error('Product not found');
+    }
+
+    const product = searchResult.data.products.edges[0].node;
+    console.log('FOUND SHOPIFY PRODUCT', product.id);
+    let id: string;
+    if (product.hasOnlyDefaultVariant) {
+      id = product.variants.edges[0].node.id;
+    } else {
+      console.log('MATCHING SKU TO PRODUCT VARIANT');
+      const variants = product.variants.edges;
+      const found = variants.find(function (variant) {
+        return variant.node.sku === sku;
+      });
+
+      if (!found) {
+        throw new Error('Variant not found');
+      }
+
+      console.log('VARIANT FOUND', found.node.id);
+      id = found.node.id;
+    }
+
+    const item = {
+      product: {
+        id: product.id,
+      },
+      variant: {
         id: id,
       },
     };
@@ -310,6 +368,59 @@ export const updateShopifyProductVariantPrice = async (
 
     console.log('UPDATED PRODUCT RESPONSE');
     console.log(updatedProduct);
+
+    return updatedProduct;
+  } catch (err: any) {
+    console.log(err.message);
+    return false;
+  }
+};
+
+export const updateShopifyProductVariant = async (
+  store: string,
+  variables: {
+    productId: string;
+    variants: {
+      id: string;
+      price?: string;
+      compareAtPrice?: string | null;
+      metafields?: {
+        namespace: string;
+        key: string;
+        type: string;
+        value: string;
+      }[];
+    }[];
+  }
+) => {
+  try {
+    const updatedProduct = await fetchAdmin<ProductVariantsBulkUpdateMutation>(
+      store,
+      productVariantsBulkUpdateMutation,
+      variables
+    );
+
+    if (updatedProduct?.errors && updatedProduct.errors.length > 0) {
+      throw new Error(updatedProduct.errors[0].message);
+    }
+
+    if (
+      updatedProduct?.data?.productVariantsBulkUpdate?.userErrors &&
+      updatedProduct.data.productVariantsBulkUpdate.userErrors.length > 0
+    ) {
+      throw new Error(
+        updatedProduct.data.productVariantsBulkUpdate.userErrors[0].message
+      );
+    }
+
+    if (!updatedProduct.data) {
+      throw new Error('Product price not updated');
+    }
+
+    // console.log(
+    //   'UPDATED PRODUCT RESPONSE',
+    //   JSON.stringify(updatedProduct, null, 2)
+    // );
 
     return updatedProduct;
   } catch (err: any) {

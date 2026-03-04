@@ -82,6 +82,7 @@ CSV header
 
 ```bash
 node lib/index.js updatePrices --store 'STORE_NAME' --import 'CSV_FILE_TO_IMPORT' --export 'CSV_FILE_TO_EXPORT_ERRORS'
+node lib/index.js updatePrices --store retail --import 'TN_SPRING_FEVER' --export 'TN_SPRING_FEVER_ERRORS'
 ```
 
 ex: node lib/index.js updatePrices --store 'retail' --import 'shopify-import-test' --export 'shopify-errors'
