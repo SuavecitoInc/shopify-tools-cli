@@ -9,7 +9,7 @@ import {
 import {
   validateStore,
   printConfig,
-  searchBySku,
+  searchBySKU,
   updateShopifyProductMetafields,
   initializeCSV,
   writeCSVRow,
@@ -118,7 +118,7 @@ const run = async (
 ) => {
   try {
     console.log('SEARCHING FOR SKU:' + sku);
-    const searchResult = await searchBySku(store, sku);
+    const searchResult = await searchBySKU(store, sku);
 
     if (!searchResult) {
       // doesn't exist - create'
@@ -126,7 +126,12 @@ const run = async (
       return false;
     } else {
       // exists - update
-      const id = searchResult.product.id;
+      const { product } = searchResult;
+      if (!product) {
+        console.log('PRODUCT NOT FOUND FOR SKU:', sku);
+        return false;
+      }
+      const id = product.id;
       console.log('UPDATING METAFIELD', id);
       return await updateShopifyProductMetafields(store, id, metafield);
     }
