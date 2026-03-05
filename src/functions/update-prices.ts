@@ -14,6 +14,7 @@ import {
   searchBySKU,
   updateShopifyProductVariant,
 } from '../lib';
+import type { Row } from '../lib/types';
 
 const DEBUG = false;
 const DIVIDER = '-------------------------------';
@@ -88,7 +89,7 @@ export const updatePrices = async (argv: any) => {
     console.log('STARTING TO PROCESS EACH ROW...');
 
     // create payload for all products/variants to update
-    for (const row of jsonArray) {
+    for (const row of jsonArray as Row[]) {
       const sku = row.SKU;
       const price = row.NewPrice;
       const comparePrice =

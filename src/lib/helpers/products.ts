@@ -50,8 +50,8 @@ export const addShopifyProductTags = async (
       throw new Error('Product tags not updated');
     }
 
-    console.log('UPDATED PRODUCT RESPONSE');
-    console.log(updatedProduct);
+    // console.log('UPDATED PRODUCT RESPONSE');
+    // console.log(updatedProduct);
 
     return updatedProduct;
   } catch (err: any) {
@@ -92,8 +92,8 @@ export const removeShopifyProductTags = async (
       throw new Error('Product tags not updated');
     }
 
-    console.log('UPDATED PRODUCT RESPONSE');
-    console.log(updatedProduct);
+    // console.log('UPDATED PRODUCT RESPONSE');
+    // console.log(updatedProduct);
 
     return updatedProduct;
   } catch (err: any) {
