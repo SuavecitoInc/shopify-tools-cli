@@ -4,6 +4,7 @@ import tagsAddMutation from './tags-add';
 import tagsRemoveMutation from './tags-remove';
 import metafieldsSetMutation from './metafields-set';
 import productVariantsBulkUpdateMutation from './product-variants-bulk-update';
+import inventoryItemUpdate from './inventory-item-update';
 
 export {
   customerCreateMutation,
@@ -12,4 +13,5 @@ export {
   tagsRemoveMutation,
   metafieldsSetMutation,
   productVariantsBulkUpdateMutation,
+  inventoryItemUpdate,
 };

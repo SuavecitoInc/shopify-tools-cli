@@ -179,3 +179,24 @@ node lib/index.js updateMetafields --store 'STORE_NAME' --import 'CSV_FILE_TO_IM
 ```
 
 ex: node lib/index.js updateMetafields --store 'retail' --import 'shopify-import-test' --export 'shopify-errors'
+
+#### Update Inventory Items (HS Code & Country of Origin)
+
+> Updates the harmonized system code (HS Code) and country of origin for inventory items.
+
+CSV header
+
+<table>
+  <tr>
+    <th>SKU</th>
+  </tr>
+</table>
+
+```bash
+node lib/index.js inventoryItemUpdate --store 'STORE_NAME' --import 'CSV_FILE_TO_IMPORT' --export 'CSV_FILE_TO_EXPORT_ERRORS'
+node lib/index.js inventoryItemUpdate --store retail --import 'TN_SPRING_FEVER' --export 'TN_SPRING_FEVER_ERRORS'
+```
+
+ex: node lib/index.js inventoryItemUpdate --store 'retail' --import 'shopify-import-test' --export 'shopify-errors'
+
+node lib/index.js inventoryItemUpdate --store 'pomade' --import 'HS_CODE_TEST' --export 'HS_CODE_TEST_ERRORS'

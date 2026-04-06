@@ -6,12 +6,16 @@ const query = `#graphql
           id
           title
           hasOnlyDefaultVariant
+          productType
           variants(first:150) {
             edges {
               node {
                 sku
                 id
                 title
+                inventoryItem {
+                  id
+                }
               }
             }
           }

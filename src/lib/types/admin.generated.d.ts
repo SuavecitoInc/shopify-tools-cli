@@ -17,6 +17,14 @@ export type CustomerUpdateMutationVariables = AdminTypes.Exact<{
 
 export type CustomerUpdateMutation = { customerUpdate?: AdminTypes.Maybe<{ userErrors: Array<Pick<AdminTypes.UserError, 'field' | 'message'>>, customer?: AdminTypes.Maybe<Pick<AdminTypes.Customer, 'id' | 'email' | 'tags'>> }> };
 
+export type InventoryItemUpdateMutationVariables = AdminTypes.Exact<{
+  id: AdminTypes.Scalars['ID']['input'];
+  input: AdminTypes.InventoryItemInput;
+}>;
+
+
+export type InventoryItemUpdateMutation = { inventoryItemUpdate?: AdminTypes.Maybe<{ inventoryItem?: AdminTypes.Maybe<Pick<AdminTypes.InventoryItem, 'id' | 'harmonizedSystemCode' | 'countryCodeOfOrigin'>>, userErrors: Array<Pick<AdminTypes.UserError, 'field' | 'message'>> }> };
+
 export type MetafieldsSetMutationVariables = AdminTypes.Exact<{
   metafields: Array<AdminTypes.MetafieldsSetInput> | AdminTypes.MetafieldsSetInput;
 }>;
@@ -61,18 +69,22 @@ export type SearchBySkuQueryVariables = AdminTypes.Exact<{
 
 
 export type SearchBySkuQuery = { products: { edges: Array<{ node: (
-        Pick<AdminTypes.Product, 'id' | 'title' | 'hasOnlyDefaultVariant'>
-        & { variants: { edges: Array<{ node: Pick<AdminTypes.ProductVariant, 'sku' | 'id' | 'title'> }> } }
+        Pick<AdminTypes.Product, 'id' | 'title' | 'hasOnlyDefaultVariant' | 'productType'>
+        & { variants: { edges: Array<{ node: (
+              Pick<AdminTypes.ProductVariant, 'sku' | 'id' | 'title'>
+              & { inventoryItem: Pick<AdminTypes.InventoryItem, 'id'> }
+            ) }> } }
       ) }> } };
 
 interface GeneratedQueryTypes {
   "#graphql\n  query getCustomersByEmail($filter: String!) {\n    customers(first:10, query: $filter) {\n      edges {\n        node {\n          id\n          verifiedEmail\n          firstName\n          lastName\n        }\n      }\n    }\n  }\n": {return: GetCustomersByEmailQuery, variables: GetCustomersByEmailQueryVariables},
-  "#graphql\n  query searchBySKU($filter: String!) {\n    products(first:1, query: $filter) {\n      edges {\n        node {\n          id\n          title\n          hasOnlyDefaultVariant\n          variants(first:150) {\n            edges {\n              node {\n                sku\n                id\n                title\n              }\n            }\n          }\n        }\n      }\n    }\n  }\n": {return: SearchBySKUQuery, variables: SearchBySKUQueryVariables},
+  "#graphql\n  query searchBySKU($filter: String!) {\n    products(first:1, query: $filter) {\n      edges {\n        node {\n          id\n          title\n          hasOnlyDefaultVariant\n          productType\n          variants(first:150) {\n            edges {\n              node {\n                sku\n                id\n                title\n                inventoryItem {\n                  id\n                }\n              }\n            }\n          }\n        }\n      }\n    }\n  }\n": {return: SearchBySKUQuery, variables: SearchBySKUQueryVariables},
 }
 
 interface GeneratedMutationTypes {
   "#graphql\n  mutation customerCreate($input: CustomerInput!) {\n    customerCreate(input: $input) {\n      userErrors {\n        field\n        message\n      }\n      customer {\n        id\n        email\n        tags\n      }\n    }\n  }\n": {return: CustomerCreateMutation, variables: CustomerCreateMutationVariables},
   "#graphql\n  mutation customerUpdate($input: CustomerInput!) {\n    customerUpdate(input: $input) {\n      userErrors {\n        field\n        message\n      }\n      customer {\n        id\n        email\n        tags\n      }\n    }\n  }\n": {return: CustomerUpdateMutation, variables: CustomerUpdateMutationVariables},
+  "#graphql\n  mutation inventoryItemUpdate($id: ID!, $input: InventoryItemInput!) {\n    inventoryItemUpdate(id: $id, input: $input) {\n      inventoryItem {\n        id\n        harmonizedSystemCode\n        countryCodeOfOrigin\n      }\n      userErrors {\n        field\n        message\n      }\n    }\n  }\n": {return: InventoryItemUpdateMutation, variables: InventoryItemUpdateMutationVariables},
   "#graphql\n  mutation metafieldsSet($metafields: [MetafieldsSetInput!]!) {\n    metafieldsSet(metafields: $metafields) {\n      metafields {\n        namespace\n        key\n        value\n      }\n      userErrors {\n        field\n        message\n      }\n    }\n  }\n": {return: MetafieldsSetMutation, variables: MetafieldsSetMutationVariables},
   "#graphql\nmutation productVariantsBulkUpdate($productId: ID!, $variants: [ProductVariantsBulkInput!]!) {\n    productVariantsBulkUpdate(productId: $productId, variants: $variants) {\n      product {\n        id\n      }\n      productVariants {\n        id\n        price\n        compareAtPrice\n      }\n      userErrors {\n        field\n        message\n      }\n    }\n  }\n": {return: ProductVariantsBulkUpdateMutation, variables: ProductVariantsBulkUpdateMutationVariables},
   "#graphql\n  mutation tagsAdd($id: ID!, $tags: [String!]!) {\n    tagsAdd(id: $id, tags: $tags) {\n      node {\n        id\n      }\n      userErrors {\n        field\n        message\n      }\n    }\n  }\n": {return: TagsAddMutation, variables: TagsAddMutationVariables},
