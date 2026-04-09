@@ -8,12 +8,9 @@ import {
 } from '../config/defaults';
 import {
   validateStore,
-  addShopifyProductTags,
   printConfig,
   initializeCSV,
-  writeRecords,
   writeCSVRow,
-  searchBySKU,
   searchForInventoryItemBySKU,
   updateInventoryItem,
 } from '../lib';
@@ -25,6 +22,8 @@ const DIVIDER = '-------------------------------';
 /*
 
 Categories Done:
+- Beard Balm
+- Beard Oil
 - Hair Cream
 - Hair Gel
 - Hair Spray
@@ -36,9 +35,9 @@ Categories Done:
 const HS_MAP = {
   Aftershave: '2106.90.99',
   Apparel: '6109.10.0000',
-  'Beard Balm': '3305.90.0000',
-  'Beard Oil': '3305.90.0000',
-  Brilliantine: '3403.19.9000',
+  'Beard Balm': '3307.90.0000',
+  'Beard Oil': '3307.90.0000',
+  Brilliantine: '3305.90.0000',
   Brush: '3403.19.9000',
   Comb: '9603.21.0000',
   Combs: '9603.21.0000',
