@@ -3,17 +3,15 @@ import {
   tagsAddMutation,
   tagsRemoveMutation,
   searchBySKUQuery,
-  searchBySKUv2Query,
   metafieldsSetMutation,
-  productVariantUpdateMutation,
+  productVariantsBulkUpdateMutation,
 } from '../schema/admin';
 import type {
   TagsAddMutation,
   TagsRemoveMutation,
   SearchBySkuQuery,
-  SearchBySkUv2Query,
   MetafieldsSetMutation,
-  ProductVariantUpdateMutation,
+  ProductVariantsBulkUpdateMutation,
 } from '../types/admin.generated';
 
 export const addShopifyProductTags = async (
@@ -48,8 +46,8 @@ export const addShopifyProductTags = async (
       throw new Error('Product tags not updated');
     }
 
-    console.log('UPDATED PRODUCT RESPONSE');
-    console.log(updatedProduct);
+    // console.log('UPDATED PRODUCT RESPONSE');
+    // console.log(updatedProduct);
 
     return updatedProduct;
   } catch (err: any) {
@@ -90,8 +88,8 @@ export const removeShopifyProductTags = async (
       throw new Error('Product tags not updated');
     }
 
-    console.log('UPDATED PRODUCT RESPONSE');
-    console.log(updatedProduct);
+    // console.log('UPDATED PRODUCT RESPONSE');
+    // console.log(updatedProduct);
 
     return updatedProduct;
   } catch (err: any) {
@@ -100,7 +98,63 @@ export const removeShopifyProductTags = async (
   }
 };
 
-export const searchBySku = async (store: string, sku: string) => {
+// export const searchBySKU = async (store: string, sku: string) => {
+//   const variables = {
+//     filter: `sku:${sku}`,
+//   };
+
+//   try {
+//     const searchResult = await fetchAdmin<SearchBySkuQuery>(
+//       store,
+//       searchBySKUQuery,
+//       variables
+//     );
+
+//     if (searchResult?.errors && searchResult.errors.length > 0) {
+//       throw new Error(searchResult.errors[0].message);
+//     }
+
+//     if (!searchResult?.data.products) {
+//       throw new Error('Product not found');
+//     }
+
+//     const product = searchResult.data.products.edges[0].node;
+//     console.log('FOUND SHOPIFY PRODUCT', product.id);
+//     let id: string;
+//     if (product.hasOnlyDefaultVariant) {
+//       id = product.variants.edges[0].node.id;
+//     } else {
+//       console.log('MATCHING SKU TO PRODUCT VARIANT');
+//       const variants = product.variants.edges;
+//       const found = variants.find(function (variant) {
+//         return variant.node.sku === sku;
+//       });
+
+//       if (!found) {
+//         throw new Error('Variant not found');
+//       }
+
+//       console.log('VARIANT FOUND', found.node.id);
+//       id = found.node.id;
+//     }
+
+//     const item = {
+//       product: {
+//         id: product.id,
+//       },
+//       variant: {
+//         id: id,
+//       },
+//     };
+
+//     return item;
+//   } catch (err: any) {
+//     console.log(err.message);
+//     return false;
+//   }
+// };
+
+export const searchBySKU = async (store: string, sku: string) => {
   const variables = {
     filter: `sku:${sku}`,
   };
@@ -116,95 +170,43 @@ export const searchBySku = async (store: string, sku: string) => {
       throw new Error(searchResult.errors[0].message);
     }
 
-    if (!searchResult?.data.products) {
-      throw new Error('Product not found');
-    }
-
-    const product = searchResult.data.products.edges[0].node;
-    console.log('FOUND SHOPIFY PRODUCTS', product.id);
-    let id: string;
-    if (product.hasOnlyDefaultVariant) {
-      id = product.variants.edges[0].node.id;
-    } else {
-      console.log('MATCHING SKU TO PRODUCT VARIANT');
-      const variants = product.variants.edges;
-      const found = variants.find(function (variant) {
-        return variant.node.sku === sku;
-      });
-
-      if (!found) {
-        throw new Error('Variant not found');
-      }
-
-      console.log('VARIANT FOUND', found.node.id);
-      id = found.node.id;
-    }
-
-    const item = {
-      product: {
-        id: id,
-      },
-    };
-
-    return item;
-  } catch (err: any) {
-    console.log(err.message);
-    return false;
-  }
-};
-
-export const searchBySkuV2 = async (
-  store: string,
-  sku: string,
-  isProduct = false
-) => {
-  const type = isProduct ? 'PRODUCT' : 'VARIANT';
-
-  const variables = {
-    filter: `sku:${sku}`,
-  };
-
-  try {
-    const searchResult = await fetchAdmin<SearchBySkUv2Query>(
-      store,
-      searchBySKUv2Query,
-      variables
-    );
-
-    if (searchResult?.errors && searchResult.errors.length > 0) {
-      throw new Error(searchResult.errors[0].message);
-    }
-
     if (!searchResult?.data?.products) {
       throw new Error('Product not found');
     }
 
     // loop through products
     const products = searchResult.data.products.edges;
-    let productFound: string | null = null;
+    let productID: string | null = null;
+    let variantID: string | null = null;
     console.log(`FOUND ${products.length} POSSIBLE PRODUCTS`);
     console.log('MATCHING SKU TO PRODUCT VARIANT');
     products.forEach(product => {
-      if (productFound) return;
+      if (productID) return;
+      console.log('MATCHING SKU TO PRODUCT VARIANT');
+
       const variants = product.node.variants.edges;
       const found = variants.find(function (variant) {
         return variant.node.sku === sku;
       });
       if (found) {
-        console.log(`${type} FOUND`, found.node.id);
-        productFound = isProduct ? product.node.id : found.node.id;
+        console.log('FOUND SHOPIFY PRODUCT', product.node.id);
+        console.log('FOUND VARIANT', found.node.id);
+        productID = product.node.id;
+        variantID = found.node.id;
       }
     });
 
-    if (productFound) {
-      console.log(`BUILDING ${type} OBJECT`, productFound);
-      const variant = {
+    if (productID && variantID) {
+      const item = {
         product: {
-          id: productFound,
+          id: productID,
+        },
+        variant: {
+          id: variantID,
         },
       };
 
-      return variant;
+      return item;
     } else {
       return false;
     }
@@ -270,24 +272,27 @@ export const updateShopifyProductMetafields = async (
   }
 };
 
-export const updateShopifyProductVariantPrice = async (
+export const updateShopifyProductVariant = async (
   store: string,
-  id: string,
-  price: string,
-  comparePrice: string
+  variables: {
+    productId: string;
+    variants: {
+      id: string;
+      price?: string;
+      compareAtPrice?: string | null;
+      metafields?: {
+        namespace: string;
+        key: string;
+        type: string;
+        value: string;
+      }[];
+    }[];
+  }
 ) => {
-  const variables = {
-    input: {
-      id: id,
-      price: price,
-      compareAtPrice: comparePrice === '0' ? null : comparePrice,
-    },
-  };
-
   try {
-    const updatedProduct = await fetchAdmin<ProductVariantUpdateMutation>(
+    const updatedProduct = await fetchAdmin<ProductVariantsBulkUpdateMutation>(
       store,
-      productVariantUpdateMutation,
+      productVariantsBulkUpdateMutation,
       variables
     );
 
@@ -296,11 +301,11 @@ export const updateShopifyProductVariantPrice = async (
     }
 
     if (
-      updatedProduct?.data?.productVariantUpdate?.userErrors &&
-      updatedProduct.data.productVariantUpdate.userErrors.length > 0
+      updatedProduct?.data?.productVariantsBulkUpdate?.userErrors &&
+      updatedProduct.data.productVariantsBulkUpdate.userErrors.length > 0
     ) {
       throw new Error(
-        updatedProduct.data.productVariantUpdate.userErrors[0].message
+        updatedProduct.data.productVariantsBulkUpdate.userErrors[0].message
       );
     }
 
@@ -308,8 +313,10 @@ export const updateShopifyProductVariantPrice = async (
       throw new Error('Product price not updated');
     }
 
-    console.log('UPDATED PRODUCT RESPONSE');
-    console.log(updatedProduct);
+    // console.log(
+    //   'UPDATED PRODUCT RESPONSE',
+    //   JSON.stringify(updatedProduct, null, 2)
+    // );
 
     return updatedProduct;
   } catch (err: any) {

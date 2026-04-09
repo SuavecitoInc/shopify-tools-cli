@@ -1,10 +1,10 @@
 const mutation = `#graphql
-  mutation productVariantUpdate($input: ProductVariantInput!) {
-    productVariantUpdate(input: $input) {
+mutation productVariantsBulkUpdate($productId: ID!, $variants: [ProductVariantsBulkInput!]!) {
+    productVariantsBulkUpdate(productId: $productId, variants: $variants) {
       product {
         id
       }
-      productVariant {
+      productVariants {
         id
         price
         compareAtPrice

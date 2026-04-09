@@ -1,10 +1,11 @@
 import yargs from 'yargs';
-import { updatePrices } from './functions/update-prices-v2';
+import { updatePrices } from './functions/update-prices';
 import { addTags } from './functions/add-tags';
 import { removeTags } from './functions/remove-tags';
 import { tagCustomers } from './functions/customer-add-tags';
 import { getProductsByTemplate } from './functions/get-products-by-template';
 import { updateMetafields } from './functions/update-metafields';
+import { inventoryItemUpdate } from './functions/inventory-item-update';
 
 const argv: any = yargs
   .command(
@@ -69,6 +70,25 @@ const argv: any = yargs
       type: 'string',
     },
   })
+  .command(
+    'inventoryItemUpdate',
+    'Updates inventory items harmonized system code and country of origin',
+    {
+      store: {
+        description:
+          'The Shopify config to use. Valid values: retail, wholesale, warehouse, professional, staging_retail, staging_wholesale',
+        alias: 's',
+        type: 'string',
+      },
+      import: {
+        description:
+          'The name of the csv to import ex: shopify-import, expected header values: SKU',
+        alias: 'i',
+        type: 'string',
+      },
+    }
+  )
+
   .option('import', {
     description: 'The name of the csv to import ex: shopify-import',
     alias: 'i',
@@ -107,6 +127,8 @@ const main = () => {
       getProductsByTemplate(argv);
     } else if (argv._.includes('updateMetafields') && argv.import) {
       updateMetafields(argv);
+    } else if (argv._.includes('inventoryItemUpdate') && argv.import) {
+      inventoryItemUpdate(argv);
     } else {
       console.log('Invalid command.');
     }
