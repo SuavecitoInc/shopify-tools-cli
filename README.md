@@ -23,6 +23,8 @@ Commands:
   index.js tagCustomers           Adds tags to customer, if customer does not
                                   exists it will create them.
   index.js updateMetafields       Updates metafields
+  index.js inventoryItemUpdate    Updates inventory items with HS code and
+                                  country of origin.
 
 Options:
       --version   Show version number                                  [boolean]
